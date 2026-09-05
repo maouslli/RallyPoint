@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CourtSide AI</title>
+<link rel="stylesheet" href="css/courtside.css">
+</head>
+<body>
+<main class="landing">
+  <h1>CourtSide AI</h1>
+  <p class="lede">Voice-scored court tablets and one organizer desk, synced live. Built for the multi-court club tournament: singles, doubles, No-Ad, Fast4, tiebreaks, changeover timers, and a sponsor loop that pays for the tablets.</p>
+  <div class="doors">
+    <a class="door desk" href="organizer.html"><strong>Organizer desk</strong><span>Queue, court assignment, alerts, rules for every court, sponsors and results.</span></a>
+    <a class="door" href="court.html?court=1"><strong>Court 1 tablet</strong><span>Score wall, voice calls, serve clock, changeover ads. Fix it to the fence.</span></a>
+    <a class="door" href="court.html?court=2"><strong>Court 2 tablet</strong><span>Same tablet, second court. Open both to watch the desk update.</span></a>
+    <a class="door demo" href="demo.html"><strong>Split-screen demo</strong><span>Desk and both courts on one page, with an “internet down” switch per court.</span></a>
+  </div>
+  <div class="how">
+    <h2>How the pieces talk</h2>
+    <p>Run <code>npm start</code> and every page connects to the WebSocket hub on this server. Open the pages without a server and they fall back to a BroadcastChannel between tabs of the same browser, with the organizer tab acting as the hub. Either way a court tablet keeps scoring while disconnected: updates queue on the device and replay when the link returns.</p>
+    <p>On a court tablet, say the score before serving, server first — “30-15”, “deuce”, “ad in”, “game” — or “fault”, “let”, “correction”, “umpire”. The tablet only accepts a call that is one point away from the score it already knows, which is what keeps the next court’s calls out.</p>
+  </div>
+</main>
+</body>
+</html>

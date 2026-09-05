@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>CourtSide AI — court tablet</title>
+<link rel="stylesheet" href="css/courtside.css">
+<style>html,body{background:#000;overflow:hidden}</style>
+</head>
+<body>
+<div id="app" style="height:100%"></div>
+<script src="js/scoring.js"></script>
+<script src="js/voice.js"></script>
+<script src="js/hub.js"></script>
+<script src="js/sync.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/court-app.js"></script>
+<script>
+  const params = new URLSearchParams(location.search);
+  const courtId = params.get('court') || '1';
+  document.title = 'Court ' + courtId + ' — CourtSide AI';
+  window.court = CourtSide.createCourtApp(document.getElementById('app'), { courtId, mode: params.get('mode') || 'auto', wsUrl: params.get('ws') || undefined });
+  // keep the screen awake on a fence-mounted tablet
+  if (navigator.wakeLock) document.addEventListener('click', () => navigator.wakeLock.request('screen').catch(() => {}), { once: true });
+</script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+{
+  "name": "courtside-ai",
+  "version": "1.0.0",
+  "description": "Voice-scored court tablets and an organizer desk for club tennis tournaments, synced over WebSockets.",
+  "main": "server/index.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js --port 8080",
+    "test": "node --test 'test/*.test.js'",
+    "build": "node scripts/build-standalone.js",
+    "reset": "node server/index.js --reset"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "jsdom": "^25.0.0"
+  }
+}

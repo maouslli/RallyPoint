@@ -1,0 +1,69 @@
+<!doctype html>
+<html lang="en-CA">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CourtSide AI — 2-court demonstrator</title>
+<link rel="stylesheet" href="css/courtside.css">
+<style>html,body{background:#0B1114;overflow:hidden}</style>
+</head>
+<body>
+<div class="demo-root">
+  <div class="demo-bar">
+    <b>CourtSide AI · 2-court demonstrator</b>
+    <span class="hint">Desk left, two fence tablets right, one simulated network. Assign, start, call a score, cut a court’s internet, keep scoring.</span>
+    <span class="spacer"></span>
+    <button class="btn" data-demo="assign-both">Assign both courts</button>
+    <button class="btn" data-demo="reset">Reset demo</button>
+  </div>
+  <div class="demo-left"><div id="desk" style="height:100%"></div></div>
+  <div class="demo-right">
+    <div class="demo-court-bar"><b>Court 1 tablet</b><span class="spacer"></span><label class="sw"><input type="checkbox" data-net="1" checked> Internet</label><button class="btn" data-auto="1">Auto-play points</button></div>
+    <div id="court1"></div>
+    <div class="demo-court-bar"><b>Court 2 tablet</b><span class="spacer"></span><label class="sw"><input type="checkbox" data-net="2" checked> Internet</label><button class="btn" data-auto="2">Auto-play points</button></div>
+    <div id="court2"></div>
+  </div>
+</div>
+<script src="js/scoring.js"></script>
+<script src="js/voice.js"></script>
+<script src="js/hub.js"></script>
+<script src="js/sync.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/court-app.js"></script>
+<script src="js/organizer-app.js"></script>
+<script>
+(function () {
+  const PREFIX = 'csdemo';
+  const host = CourtSide.hub.createHost({ courts: 2, state: CourtSide.sync.load(PREFIX + ':tournament', null) || undefined, persist: s => CourtSide.sync.save(PREFIX + ':tournament', s) });
+  const localHub = CourtSide.sync.createLocalHub(host, { latencyMs: 200 });
+  const desk = CourtSide.createOrganizerApp(document.getElementById('desk'), { localHub, courts: 2 });
+  const courts = {
+    '1': CourtSide.createCourtApp(document.getElementById('court1'), { courtId: '1', localHub, storagePrefix: PREFIX }),
+    '2': CourtSide.createCourtApp(document.getElementById('court2'), { courtId: '2', localHub, storagePrefix: PREFIX })
+  };
+  window.demo = { host, localHub, desk, courts };
+
+  document.querySelectorAll('[data-net]').forEach(cb => cb.addEventListener('change', () => {
+    courts[cb.dataset.net].setOnline(cb.checked);
+    cb.parentElement.classList.toggle('cut', !cb.checked);
+    cb.parentElement.lastChild.textContent = cb.checked ? ' Internet' : ' Internet cut — scoring locally';
+  }));
+  document.querySelectorAll('[data-auto]').forEach(b => b.addEventListener('click', () => {
+    const on = !b.classList.contains('on');
+    b.classList.toggle('on', on);
+    b.textContent = on ? 'Stop auto-play' : 'Auto-play points';
+    courts[b.dataset.auto].autoplay(on, 1100);
+  }));
+  document.querySelector('[data-demo="assign-both"]').addEventListener('click', () => {
+    const t = host.state;
+    const free = Object.values(t.courts).filter(c => c.status === 'free' || c.status === 'done');
+    free.forEach((c, i) => { if (t.queue[i]) desk.send({ type: 'org:assign', courtId: c.id, matchId: t.queue[i] }); });
+  });
+  document.querySelector('[data-demo="reset"]').addEventListener('click', () => {
+    Object.keys(localStorage).filter(k => k.startsWith(PREFIX + ':')).forEach(k => localStorage.removeItem(k));
+    location.reload();
+  });
+})();
+</script>
+</body>
+</html>

@@ -20,7 +20,7 @@ voice works. `--key/--cert` (or `SSL_KEY`/`SSL_CERT`) override the certs.
 
 | Page | What it is |
 | --- | --- |
-| `/` | RallyPoint homepage: a WebGL night court with a rally scored by the real engine, and the door to every screen |
+| `/` | RallyPoint homepage |
 | `/organizer.html` | The desk: queue, court cards, alerts, rules, sponsors, results |
 | `/court.html?court=1` | Court 1 tablet (fence-mounted, landscape) |
 | `/court.html?court=2` | Court 2 tablet |
@@ -77,28 +77,6 @@ public/vendor/three.min.js  three.js r158 (UMD), vendored so the page works offl
 ```
 
 All modules are plain scripts that run unchanged in the browser and in Node (the server requires `hub.js` directly). The hub reducer is the single source of truth for tournament-level state; each tablet is the source of truth for its own match and reports snapshots.
-
-### Protocol
-
-Court → hub: `hello`, `court:state {courtId, seq, snapshot}`, `court:event {kind: umpire | impression | dispute | offlineReplay}`, `bye`.
-Desk → hub: `org:assign`, `org:clearCourt`, `org:rules`, `org:sponsors`, `org:ack`, `org:addMatch`, `org:removeMatch`, `org:reorderQueue`, `org:setTournament`, `org:reset`.
-Hub → everyone: `snapshot` (on hello) and `tournament` (after every change). Court snapshots carry a monotonic `seq`; the hub ignores stale ones so a replayed backlog cannot roll a court backwards.
-
-## Answers to the "before you build" questions
-
-**Filtering noise and adjacent-court calls.** The tablet does not obey a transcript, it *reconciles* it. A spoken score is an assertion about the state of this match: if it equals the current score it is a confirmation, if it is exactly one point away it is applied, if it matches both "server first" and "receiver first" readings it asks, and anything else, including a call that can only belong to the next court, is rejected and shown as "Not reachable from 30-15" with a one-tap "Set score to X" override for the rare case the tablet is the one that is wrong. On top of that: a confidence floor across the recognizer's alternatives, an optional wake word ("Score, 30-15"), tap-to-arm mode (the mic listens for eight seconds after a tap), and the tablet mutes its own microphone while it speaks so it never hears itself.
-
-**Disputes.** Every accepted call shows a toast with an Undo button; "correction" spoken or tapped reverts the last point (up to 80 steps). Override edits games, points, server and tiebreak state in one screen. "Umpire" raises an alert at the desk with the court number; the desk acknowledges with "On my way" and the tablet shows the director has been called. Every change is written to a per-match log ("Override: 4-3 (30-15)", "Correction", "Rules v3 applied") visible in the tablet's Settings drawer.
-
-**Doubles rotation in tiebreaks.** The engine tracks serve order as a four-player cycle. In a tiebreak the player due to serve serves the first point, then each player serves two points in the cycle; ends change every six points; the set after a tiebreak starts with the player who received the first point of the tiebreak. The score wall names the server and the receiver for every point (deuce or ad court), which is where doubles teams actually lose track.
-
-**Misheard or mispronounced scores.** The parser accepts numbers, words, French, glued digits ("3015"), "five" for fifteen and "juice" for deuce; the recognizer tries up to four alternatives in confidence order and the first one that is *reachable* wins. Whatever is accepted is echoed on the wall and spoken back, with Undo one tap away, so a wrong point never lives longer than the next call.
-
-**Loading sponsors into the changeover loop.** The desk's sponsor panel: add a name, tagline, colour, spoken line and duration, optionally a logo URL, then "Push loop to courts". Tablets cache the loop, cycle through it during changeovers and set breaks, speak the audio line once per play, and report each play to the desk, which totals plays per sponsor and multiplies by a dollars-per-play rate.
-
-**Dashboard and match configuration.** The desk is one screen with no modes: queue on the left, courts in the middle, rules and sponsors on the right, results below. Rules are global and versioned; a court card shows "v2 (desk is v3)" until the tablet confirms the push. Matches are configured in the queue (round, format, names) and everything else is a rule.
-
-**Scoreboard graphics.** Sets / games / points in three columns, the largest type given to points; the server dot and the call in optic yellow; names in family-name form for doubles so they fit; glare mode for direct sun; the changeover overlay carries the score under the sponsor so spectators never lose it.
 
 ## Tests
 

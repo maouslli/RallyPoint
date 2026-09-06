@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CourtSide AI — 2-court demonstrator</title>
-<link rel="stylesheet" href="css/courtside.css">
+<title>RallyPoint — 2-court demonstrator</title>
+<link rel="stylesheet" href="css/rallypoint.css">
 <style>html,body{background:#0B1114;overflow:hidden}</style>
 </head>
 <body>
 <div class="demo-root">
   <div class="demo-bar">
-    <b>CourtSide AI · 2-court demonstrator</b>
+    <b>RallyPoint · 2-court demonstrator</b>
     <span class="hint">Desk left, two fence tablets right, one simulated network. Assign, start, call a score, cut a court’s internet, keep scoring.</span>
     <span class="spacer"></span>
     <button class="btn" data-demo="assign-both">Assign both courts</button>
@@ -34,12 +34,12 @@
 <script>
 (function () {
   const PREFIX = 'csdemo';
-  const host = CourtSide.hub.createHost({ courts: 2, state: CourtSide.sync.load(PREFIX + ':tournament', null) || undefined, persist: s => CourtSide.sync.save(PREFIX + ':tournament', s) });
-  const localHub = CourtSide.sync.createLocalHub(host, { latencyMs: 200 });
-  const desk = CourtSide.createOrganizerApp(document.getElementById('desk'), { localHub, courts: 2 });
+  const host = RallyPoint.hub.createHost({ courts: 2, state: RallyPoint.sync.load(PREFIX + ':tournament', null) || undefined, persist: s => RallyPoint.sync.save(PREFIX + ':tournament', s) });
+  const localHub = RallyPoint.sync.createLocalHub(host, { latencyMs: 200 });
+  const desk = RallyPoint.createOrganizerApp(document.getElementById('desk'), { localHub, courts: 2 });
   const courts = {
-    '1': CourtSide.createCourtApp(document.getElementById('court1'), { courtId: '1', localHub, storagePrefix: PREFIX }),
-    '2': CourtSide.createCourtApp(document.getElementById('court2'), { courtId: '2', localHub, storagePrefix: PREFIX })
+    '1': RallyPoint.createCourtApp(document.getElementById('court1'), { courtId: '1', localHub, storagePrefix: PREFIX }),
+    '2': RallyPoint.createCourtApp(document.getElementById('court2'), { courtId: '2', localHub, storagePrefix: PREFIX })
   };
   window.demo = { host, localHub, desk, courts };
 

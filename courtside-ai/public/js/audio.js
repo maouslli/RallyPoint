@@ -1,5 +1,5 @@
 /*
- * CourtSide AI — audio
+ * RallyPoint — audio
  * Short synthesized tones (no assets needed) and a speak() helper.
  */
 (function (root) {
@@ -59,6 +59,6 @@
   }
   function stopSpeaking() { if (root.speechSynthesis) root.speechSynthesis.cancel(); }
 
-  root.CourtSide = root.CourtSide || {};
-  root.CourtSide.audio = { tone, cues, speak, stopSpeaking, unlock };
+  root.RallyPoint = root.RallyPoint || {};
+  root.RallyPoint.audio = { tone, cues, speak, stopSpeaking, unlock };
 })(typeof self !== 'undefined' ? self : this);

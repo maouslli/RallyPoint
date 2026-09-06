@@ -3,24 +3,107 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CourtSide AI</title>
-<link rel="stylesheet" href="css/courtside.css">
+<title>RallyPoint</title>
+<meta name="description" content="RallyPoint: voice-scored court tablets and one organizer desk for club tennis tournaments, synced live.">
+<meta name="theme-color" content="#05070A">
+<link rel="stylesheet" href="css/rallypoint.css">
 </head>
-<body>
-<main class="landing">
-  <h1>CourtSide AI</h1>
-  <p class="lede">Voice-scored court tablets and one organizer desk, synced live. Built for the multi-court club tournament: singles, doubles, No-Ad, Fast4, tiebreaks, changeover timers, and a sponsor loop that pays for the tablets.</p>
-  <div class="doors">
-    <a class="door desk" href="organizer.html"><strong>Organizer desk</strong><span>Queue, court assignment, alerts, rules for every court, sponsors and results.</span></a>
-    <a class="door" href="court.html?court=1"><strong>Court 1 tablet</strong><span>Score wall, voice calls, serve clock, changeover ads. Fix it to the fence.</span></a>
-    <a class="door" href="court.html?court=2"><strong>Court 2 tablet</strong><span>Same tablet, second court. Open both to watch the desk update.</span></a>
-    <a class="door demo" href="demo.html"><strong>Split-screen demo</strong><span>Desk and both courts on one page, with an “internet down” switch per court.</span></a>
-  </div>
-  <div class="how">
-    <h2>How the pieces talk</h2>
-    <p>Run <code>npm start</code> and every page connects to the WebSocket hub on this server. Open the pages without a server and they fall back to a BroadcastChannel between tabs of the same browser, with the organizer tab acting as the hub. Either way a court tablet keeps scoring while disconnected: updates queue on the device and replay when the link returns.</p>
-    <p>On a court tablet, say the score before serving, server first — “30-15”, “deuce”, “ad in”, “game” — or “fault”, “let”, “correction”, “umpire”. The tablet only accepts a call that is one point away from the score it already knows, which is what keeps the next court’s calls out.</p>
-  </div>
+<body class="lp">
+<canvas id="court3d" class="lp-canvas" aria-hidden="true"></canvas>
+<div class="lp-fallback" aria-hidden="true"><div class="plane"></div><div class="net"></div></div>
+<div class="lp-vignette" aria-hidden="true"></div>
+
+<header class="lp-nav">
+  <a class="lp-brand" href="#"><span class="lp-mark"></span>RallyPoint</a>
+  <nav>
+    <a href="#enter">Enter</a>
+    <a href="#how">How it works</a>
+    <a href="demo.html">Demo</a>
+  </nav>
+  <span class="lp-live"><i></i>Live · <b id="live-call">Love all</b></span>
+</header>
+
+<main class="lp-main">
+  <section class="lp-hero">
+    <div>
+      <p class="lp-kicker">Voice-scored tennis for club tournaments</p>
+      <h1>Say the score.<br><em>The court keeps it.</em></h1>
+      <p class="lp-lede">A tablet on every fence and one organizer desk, synced live. Players call <b>“30-15”</b>, <b>“deuce”</b>, <b>“fault”</b>. The court only accepts a call that is one point away from what it already knows, so the next court's voices stay out. Serve clocks, changeovers, sponsor loops and rules pushed from the desk.</p>
+      <div class="lp-cta">
+        <a class="lp-btn primary" href="organizer.html">Open the organizer desk <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a>
+        <a class="lp-btn" href="demo.html">Watch the split-screen demo</a>
+      </div>
+    </div>
+    <div class="lp-board" id="board" aria-label="Demonstration scoreboard">
+      <div class="head"><span>Exhibition · singles</span><span>Sets</span><span>Games</span><span>Pts</span></div>
+      <div class="row" data-team="0"><div class="nm"><i></i><span>—</span></div><div class="n s">0</div><div class="n g">0</div><div class="n pts">0</div></div>
+      <div class="row" data-team="1"><div class="nm"><i></i><span>—</span></div><div class="n s">0</div><div class="n g">0</div><div class="n pts">0</div></div>
+      <div class="call"><span><b id="board-call">Love all</b> · <span id="board-server">—</span> to serve</span><span class="set" id="board-sets"></span></div>
+    </div>
+  </section>
+
+  <section class="lp-section" id="enter">
+    <h2>Pick a screen</h2>
+    <p class="sub">Every page talks to the hub on this server. Open the tablets on the courts, keep the desk with the organizer.</p>
+    <div class="lp-doors">
+      <a class="lp-door desk" href="organizer.html">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg></div>
+        <strong>Organizer desk</strong>
+        <span>Queue, court assignment, alerts, rules for every court, sponsors and results.</span>
+        <span class="go">→</span>
+      </a>
+      <a class="lp-door" href="court.html?court=1">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 7h6M9 11h6M9 15h3"/></svg></div>
+        <strong>Court 1 tablet</strong>
+        <span>Score wall, voice calls, serve clock, changeover ads. Fix it to the fence.</span>
+        <span class="go">→</span>
+      </a>
+      <a class="lp-door" href="court.html?court=2">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="3" width="16" height="18" rx="2"/><path d="M9 7h6M9 11h6M9 15h3"/></svg></div>
+        <strong>Court 2 tablet</strong>
+        <span>Same tablet, second court. Open both to watch the desk update.</span>
+        <span class="go">→</span>
+      </a>
+      <a class="lp-door demo" href="demo.html">
+        <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="9" height="16" rx="1.5"/><rect x="13" y="4" width="9" height="7" rx="1.5"/><rect x="13" y="13" width="9" height="7" rx="1.5"/></svg></div>
+        <strong>Split-screen demo</strong>
+        <span>Desk and both courts on one page, with an “internet down” switch per court.</span>
+        <span class="go">→</span>
+      </a>
+    </div>
+  </section>
+
+  <section class="lp-section" id="how">
+    <h2>How a point gets scored</h2>
+    <p class="sub">No referee, no clipboard. The players call it, the tablet checks it, the desk sees it.</p>
+    <div class="lp-steps">
+      <div class="lp-step">
+        <h3>Assign from the desk</h3>
+        <p>Queue the draw, tap a court, and the tablet on that fence shows the names and who serves first. Rules are global and versioned; change them once and every live court adopts them.</p>
+      </div>
+      <div class="lp-step">
+        <h3>Say the score before you serve</h3>
+        <p>Server first, English or French. The tablet <b>reconciles</b> instead of obeying: a call that is one point away is applied, the same score is a confirmation, anything else is rejected with a one-tap fix.</p>
+        <div class="lp-calls"><span>30-15</span><span>quinze partout</span><span>deuce</span><span>ad in</span><span>game</span><span>fault</span><span>let</span><span>correction</span><span>umpire</span></div>
+      </div>
+      <div class="lp-step">
+        <h3>It syncs, even when the Wi-Fi does not</h3>
+        <p>Every change is saved on the tablet and queued in an outbox. Cut the link and the court keeps scoring; reconnect and the desk catches up in order. Changeovers run the sponsor loop and call “Time”.</p>
+      </div>
+    </div>
+  </section>
 </main>
+
+<footer class="lp-foot">
+  <span>Run <code>npm start</code> and open <code>https://&lt;lan-ip&gt;:3000</code> on the tablets.</span>
+  <span class="spacer"></span>
+  <a href="api/state">JSON state</a>
+  <a href="api/results.csv">Results CSV</a>
+</footer>
+
+<script src="vendor/three.min.js"></script>
+<script src="js/scoring.js"></script>
+<script src="js/landing-rally.js"></script>
+<script src="js/landing.js"></script>
 </body>
 </html>

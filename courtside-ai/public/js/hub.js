@@ -1,12 +1,12 @@
 /*
- * CourtSide AI — tournament hub
+ * RallyPoint — tournament hub
  * The one source of truth for courts, the match queue, rules, sponsors,
  * alerts, results and ad impressions. Pure reducer + a small host wrapper
  * that turns client messages into broadcasts. Runs in Node and the browser.
  */
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory(require('./scoring.js'));
-  else { root.CourtSide = root.CourtSide || {}; root.CourtSide.hub = factory(root.CourtSide.scoring); }
+  else { root.RallyPoint = root.RallyPoint || {}; root.RallyPoint.hub = factory(root.RallyPoint.scoring); }
 })(typeof self !== 'undefined' ? self : this, function (scoring) {
   'use strict';
 

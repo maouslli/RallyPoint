@@ -1,4 +1,4 @@
-# CourtSide AI
+# RallyPoint
 
 Voice-scored court tablets and one organizer desk, synced live over WebSockets. Built as a two-court demonstrator for club and community tennis tournaments: singles, doubles and mixed rotations, No-Ad, Fast4/Express, set and 10-point match tiebreaks, serve clocks, timed changeovers with a spoken "Time" call, court-side sponsor loops, and rules pushed to every court from the desk.
 
@@ -20,6 +20,7 @@ voice works. `--key/--cert` (or `SSL_KEY`/`SSL_CERT`) override the certs.
 
 | Page | What it is |
 | --- | --- |
+| `/` | RallyPoint homepage: a WebGL night court with a rally scored by the real engine, and the door to every screen |
 | `/organizer.html` | The desk: queue, court cards, alerts, rules, sponsors, results |
 | `/court.html?court=1` | Court 1 tablet (fence-mounted, landscape) |
 | `/court.html?court=2` | Court 2 tablet |
@@ -28,7 +29,7 @@ voice works. `--key/--cert` (or `SSL_KEY`/`SSL_CERT`) override the certs.
 
 Open the tablet pages on real tablets on the same Wi-Fi using the LAN address printed at start-up. The server keeps tournament state in `data/tournament.json`; `npm run reset` wipes it. `--port 8080` and `--courts 4` are accepted.
 
-**No server?** Open `public/organizer.html` and `public/court.html?court=1` as files in the same browser: the pages fall back to a BroadcastChannel and the organizer tab hosts the hub. `npm run build` produces `dist/courtside-standalone.html`, the whole demonstrator in one file that runs from disk.
+**No server?** Open `public/organizer.html` and `public/court.html?court=1` as files in the same browser: the pages fall back to a BroadcastChannel and the organizer tab hosts the hub. `npm run build` produces `dist/rallypoint-standalone.html`, the whole demonstrator in one file that runs from disk.
 
 **Voice** needs Chrome/Edge/Safari with microphone permission over `https://` or `localhost`. Every voice call can also be typed into the tablet's call box, which goes through the identical pipeline, so the demo is fully testable without a microphone.
 
@@ -70,6 +71,9 @@ public/js/court-app.js      tablet UI (factory: createCourtApp)
 public/js/organizer-app.js  desk UI (factory: createOrganizerApp)
 server/index.js        static files + `ws` hub, JSON persistence
 public/demo.html       both apps and an in-page hub with a simulated network
+public/js/landing-rally.js  homepage demo match driven through the engine       (tested)
+public/js/landing.js   homepage: three.js night court, rally physics, scoreboard
+public/vendor/three.min.js  three.js r158 (UMD), vendored so the page works offline
 ```
 
 All modules are plain scripts that run unchanged in the browser and in Node (the server requires `hub.js` directly). The hub reducer is the single source of truth for tournament-level state; each tablet is the source of truth for its own match and reports snapshots.
@@ -99,7 +103,7 @@ Hub → everyone: `snapshot` (on hello) and `tournament` (after every change). C
 ## Tests
 
 ```bash
-npm test                     # 33 unit tests: engine, parser, hub
+npm test                     # 43 unit tests: engine, parser, hub, homepage rally, branding
 npm i -D jsdom && npm run build && npm test   # + a jsdom end-to-end run of the demonstrator
 ```
 

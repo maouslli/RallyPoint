@@ -47,7 +47,7 @@ const opensslArgs = [
   'req', '-x509', '-newkey', 'rsa:2048',
   '-keyout', KEY, '-out', CERT,
   '-days', String(DAYS), '-nodes',
-  '-subj', '/CN=CourtSide AI LAN/',
+  '-subj', '/CN=RallyPoint LAN/',
   '-addext', 'subjectAltName=' + sans,
 ];
 const r = spawnSync('openssl', opensslArgs, { stdio: 'inherit' });

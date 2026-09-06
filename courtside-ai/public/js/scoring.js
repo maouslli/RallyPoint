@@ -1,11 +1,11 @@
 /*
- * CourtSide AI — scoring engine
+ * RallyPoint — scoring engine
  * Pure functions over a plain match object. No DOM, no timers.
- * Works in the browser (window.CourtSide.scoring) and in Node (module.exports).
+ * Works in the browser (window.RallyPoint.scoring) and in Node (module.exports).
  */
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory();
-  else { root.CourtSide = root.CourtSide || {}; root.CourtSide.scoring = factory(); }
+  else { root.RallyPoint = root.RallyPoint || {}; root.RallyPoint.scoring = factory(); }
 })(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 

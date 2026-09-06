@@ -1,12 +1,12 @@
 /*
- * CourtSide AI — voice module
+ * RallyPoint — voice module
  * parseCall(): turns a transcript into a score assertion or a command (English + French).
  * createRecognizer(): thin wrapper over the Web Speech API with alternatives,
  * confidence gating, a wake-word option, auto-restart and self-mute during TTS.
  */
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory();
-  else { root.CourtSide = root.CourtSide || {}; root.CourtSide.voice = factory(); }
+  else { root.RallyPoint = root.RallyPoint || {}; root.RallyPoint.voice = factory(); }
 })(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 

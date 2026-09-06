@@ -1,10 +1,10 @@
 /*
- * CourtSide AI — court scorer tablet
+ * RallyPoint — court scorer tablet
  * createCourtApp(rootElement, { courtId, localHub?, mode?, wsUrl? })
  */
 (function (root) {
   'use strict';
-  const S = root.CourtSide.scoring, V = root.CourtSide.voice, A = root.CourtSide.audio, SY = root.CourtSide.sync;
+  const S = root.RallyPoint.scoring, V = root.RallyPoint.voice, A = root.RallyPoint.audio, SY = root.RallyPoint.sync;
 
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   // on the wall, doubles pairs read as family names so they fit at 40 m
@@ -373,7 +373,7 @@
         '<span class="pill ' + (st.phase === 'live' ? 'live' : '') + '">' + (st.phase === 'live' ? 'Live' : st.phase === 'ready' ? 'Ready' : st.phase === 'done' ? 'Finished' : 'Free') + '</span>' +
         '<span class="pill ' + vcls + '">' + vlabel + '</span>' +
         '<span class="pill ' + net + '">' + netLabel + '</span>' +
-        '<button class="ctl" data-action="settings" style="font-size:2cqw;min-height:0;padding:0.5cqw 1cqw" aria-label="Settings">Settings</button>' +
+        '<button class="ctl" data-action="settings" style="font-size:calc(2 * var(--u));min-height:0;padding:calc(0.5 * var(--u)) calc(1 * var(--u))" aria-label="Settings">Settings</button>' +
         '</div>';
     }
 
@@ -419,7 +419,7 @@
         '<div class="final">' + esc(shortNames(m.teams[m.winner])) + '</div><p>defeats ' + esc(shortNames(m.teams[1 - m.winner])) + '</p>' +
         '<div class="final" style="color:var(--ball)">' + esc(S.setLine(m)) + '</div>' +
         '<p>' + (sent ? 'Result sent to the organizer desk.' : 'Result saved on this tablet — it will reach the desk when the link is back.') + '</p>' +
-        '<div style="display:flex;gap:1cqw;justify-content:center;flex-wrap:wrap"><button class="ctl warn" data-action="correction">Correction</button><button class="bigbtn" style="display:inline-flex;text-align:center" data-action="clear">Clear court<small>Ready for the next match</small></button></div>' +
+        '<div style="display:flex;gap:calc(1 * var(--u));justify-content:center;flex-wrap:wrap"><button class="ctl warn" data-action="correction">Correction</button><button class="bigbtn" style="display:inline-flex;text-align:center" data-action="clear">Clear court<small>Ready for the next match</small></button></div>' +
         '</div></div>';
     }
 
@@ -500,7 +500,7 @@
         inner = '<h3>Override the score</h3><p>Set games and points directly. The change is logged and can be corrected.</p><div class="grid">' +
           stepper('Games · ' + shortNames(m.teams[0]), 'games', 0) + stepper('Games · ' + shortNames(m.teams[1]), 'games', 1) +
           stepper(ptLbl(0), 'points', 0) + stepper(ptLbl(1), 'points', 1) + '</div>' +
-          '<div class="grid"><div class="stepper"><div class="lbl">Server</div><div class="opts" style="display:flex;flex-wrap:wrap;gap:0.6cqw">' + m.serveOrder.map((s, i) => '<button class="ctl ' + (o.serveIdx === i ? 'on' : '') + '" data-action="ov-server" data-i="' + i + '">' + esc(m.teams[s.team].players[s.player].name) + '</button>').join('') + '</div></div>' +
+          '<div class="grid"><div class="stepper"><div class="lbl">Server</div><div class="opts" style="display:flex;flex-wrap:wrap;gap:calc(0.6 * var(--u))">' + m.serveOrder.map((s, i) => '<button class="ctl ' + (o.serveIdx === i ? 'on' : '') + '" data-action="ov-server" data-i="' + i + '">' + esc(m.teams[s.team].players[s.player].name) + '</button>').join('') + '</div></div>' +
           '<div class="stepper"><div class="lbl">Tiebreak</div><button class="ctl ' + (o.tiebreak ? 'on' : '') + '" data-action="ov-tb">' + (o.tiebreak ? 'In a tiebreak' : 'Not in a tiebreak') + '</button></div></div>' +
           '<div class="btns"><button class="ctl" data-action="close-modal">Cancel</button><button class="ctl on" data-action="ov-apply">Apply override</button></div>';
       }
@@ -626,5 +626,5 @@
     return api;
   }
 
-  root.CourtSide.createCourtApp = createCourtApp;
+  root.RallyPoint.createCourtApp = createCourtApp;
 })(typeof self !== 'undefined' ? self : this);

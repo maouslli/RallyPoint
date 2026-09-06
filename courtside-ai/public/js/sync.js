@@ -1,5 +1,5 @@
 /*
- * CourtSide AI — sync
+ * RallyPoint — sync
  * createTransport() gives every app the same send()/onMessage() surface over:
  *   ws     — the Node hub (server/index.js), for real deployments
  *   bc     — BroadcastChannel between tabs; the organizer tab hosts the hub
@@ -9,11 +9,11 @@
  */
 (function (root, factory) {
   if (typeof module === 'object' && module.exports) module.exports = factory();
-  else { root.CourtSide = root.CourtSide || {}; root.CourtSide.sync = factory(); }
+  else { root.RallyPoint = root.RallyPoint || {}; root.RallyPoint.sync = factory(); }
 })(typeof self !== 'undefined' ? self : this, function () {
   'use strict';
 
-  const CHANNEL = 'courtside-ai';
+  const CHANNEL = 'rallypoint';
 
   function storage() {
     try { return typeof localStorage !== 'undefined' ? localStorage : null; } catch (e) { return null; }

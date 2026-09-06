@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>CourtSide AI — organizer desk</title>
-<link rel="stylesheet" href="css/courtside.css">
+<title>RallyPoint — organizer desk</title>
+<link rel="stylesheet" href="css/rallypoint.css">
 <style>html,body{background:#E9EDEB}</style>
 </head>
 <body>
@@ -17,7 +17,7 @@
 <script src="js/organizer-app.js"></script>
 <script>
   const params = new URLSearchParams(location.search);
-  window.desk = CourtSide.createOrganizerApp(document.getElementById('app'), { mode: params.get('mode') || 'auto', wsUrl: params.get('ws') || undefined, courts: +(params.get('courts') || 2) });
+  window.desk = RallyPoint.createOrganizerApp(document.getElementById('app'), { mode: params.get('mode') || 'auto', wsUrl: params.get('ws') || undefined, courts: +(params.get('courts') || 2) });
 </script>
 </body>
 </html>

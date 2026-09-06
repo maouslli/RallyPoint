@@ -1,5 +1,5 @@
 {
-  "name": "courtside-ai",
+  "name": "rallypoint",
   "version": "1.0.0",
   "description": "Voice-scored court tablets and an organizer desk for club tennis tournaments, synced over WebSockets.",
   "main": "server/index.js",

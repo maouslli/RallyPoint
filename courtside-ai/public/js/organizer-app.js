@@ -1,10 +1,10 @@
 /*
- * CourtSide AI — organizer desk
+ * RallyPoint — organizer desk
  * createOrganizerApp(rootElement, { localHub?, mode?, wsUrl?, courts? })
  */
 (function (root) {
   'use strict';
-  const S = root.CourtSide.scoring, H = root.CourtSide.hub, A = root.CourtSide.audio, SY = root.CourtSide.sync;
+  const S = root.RallyPoint.scoring, H = root.RallyPoint.hub, A = root.RallyPoint.audio, SY = root.RallyPoint.sync;
 
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const names = t => t.players.map(p => p.name).join(' / ');
@@ -70,7 +70,7 @@
       const hub = st.net.status !== 'online' ? ['hub-off', st.net.status === 'connecting' ? 'Connecting to hub' : 'Hub offline'] :
         st.net.mode === 'ws' ? ['hub-ws', 'Hub: server'] : st.net.mode === 'local' ? ['hub-local', 'Hub: in-page demo'] : ['hub-bc', 'Hub: this tab'];
       const t = st.t;
-      return '<div class="dk-top"><h1>' + (t ? '<input data-field="name" data-keep="name" value="' + esc(t.name) + '" aria-label="Tournament name"><small>' + esc(t.venue || '') + '</small>' : 'CourtSide AI') + '</h1>' +
+      return '<div class="dk-top"><h1>' + (t ? '<input data-field="name" data-keep="name" value="' + esc(t.name) + '" aria-label="Tournament name"><small>' + esc(t.venue || '') + '</small>' : 'RallyPoint') + '</h1>' +
         '<span class="pill" style="border-color:#3A4045;color:#AEB7BC">Organizer desk</span><span class="spacer"></span>' +
         '<span class="pill ' + hub[0] + '">' + hub[1] + '</span><span class="clock">' + hhmm(Date.now()) + '</span></div>';
     }
@@ -292,5 +292,5 @@
     return { transport, state: st, render, host, send };
   }
 
-  root.CourtSide.createOrganizerApp = createOrganizerApp;
+  root.RallyPoint.createOrganizerApp = createOrganizerApp;
 })(typeof self !== 'undefined' ? self : this);

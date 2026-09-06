@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 /*
- * CourtSide AI — hub server
+ * RallyPoint — hub server
  * Serves the static apps and runs the WebSocket hub that keeps every court
  * tablet and the organizer desk on the same tournament state.
  *
@@ -130,7 +130,7 @@ setInterval(() => dispatch(host.handle({ type: 'tick' }, 'server')), 5000);
 server.listen(PORT, () => {
   const nets = os.networkInterfaces();
   const lan = Object.values(nets).flat().filter(n => n && n.family === 'IPv4' && !n.internal).map(n => n.address);
-  console.log('CourtSide AI hub on https://localhost:' + PORT + (lan.length ? '  (LAN: ' + lan.map(a => 'https://' + a + ':' + PORT).join(', ') + ')' : ''));
+  console.log('RallyPoint hub on https://localhost:' + PORT + (lan.length ? '  (LAN: ' + lan.map(a => 'https://' + a + ':' + PORT).join(', ') + ')' : ''));
   console.log('  Self-signed cert: tablets will show a one-time warning — accept it, then voice works.');
   console.log('  Organizer desk  /organizer.html');
   for (let i = 1; i <= COURTS; i++) console.log('  Court ' + i + ' tablet  /court.html?court=' + i);

@@ -7,7 +7,7 @@ const path = require('path');
 
 let JSDOM = null;
 try { JSDOM = require('jsdom').JSDOM; } catch (e) { /* optional */ }
-const file = path.join(__dirname, '..', 'dist', 'courtside-standalone.html');
+const file = path.join(__dirname, '..', 'dist', 'rallypoint-standalone.html');
 const available = JSDOM && fs.existsSync(file);
 
 const sleep = ms => new Promise(r => setTimeout(r, ms));

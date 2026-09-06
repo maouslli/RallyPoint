@@ -127,8 +127,49 @@
       start, stop, setLang, setWakeWord, mute, arm, feedText
     };
     let rec = null, wantListening = false, restartTimer = null;
+    // Interim auto-commit: some browsers (mobile Safari, recent Chrome) keep a
+    // continuous recognition open with interim updates only and emit `final`
+    // solely when the mic is stopped. To restore "act the second it hears the
+    // command, then listen again", we commit a stable interim transcript that
+    // already parses, and nudge stalled recognitions via a silence stop.
+    let interimTimer = null, silenceTimer = null, pendingInterim = '';
+    let lastCommitNorm = '', lastCommitAt = 0;
+    const INTERIM_DELAY_MS = opts.interimDelayMs != null ? opts.interimDelayMs : 800;
+    const SILENCE_STOP_MS = opts.silenceStopMs != null ? opts.silenceStopMs : 1600;
+    const DEDUPE_MS = 4000;
 
     function emitStatus(s, extra) { api.status = s; if (opts.onStatus) opts.onStatus(s, extra || {}); }
+
+    function clearVoiceTimers() { clearTimeout(interimTimer); interimTimer = null; clearTimeout(silenceTimer); silenceTimer = null; pendingInterim = ''; }
+
+    function scheduleSilenceStop() {
+      clearTimeout(silenceTimer);
+      silenceTimer = setTimeout(() => {
+        // No new speech for a while: force the engine to finalize the
+        // current utterance so onresult(onend) fires without mic-toggling.
+        if (wantListening && rec) { try { rec.stop(); } catch (e) { /* restarts via onend */ } }
+      }, SILENCE_STOP_MS);
+    }
+
+    function tryCommitInterim(transcript) {
+      const now = Date.now();
+      if (!transcript || !transcript.trim()) return;
+      if (now < api.mutedUntil) return;
+      if (!api.armed) return;
+      const norm = normalize(transcript);
+      if (!norm) return;
+      if (norm === lastCommitNorm && (now - lastCommitAt) < DEDUPE_MS) return;
+      const a = parseCall(transcript, { wakeWord: api.wakeWord });
+      if (!a) return;
+      const v = opts.validate ? opts.validate(a) : { ok: true };
+      if (!v.ok) return;
+      lastCommitNorm = norm; lastCommitAt = now;
+      clearVoiceTimers();
+      if (opts.onCall) opts.onCall(a, { transcript, confidence: 1, source: 'mic-interim' });
+      // Segment the utterance: stop forces onend, which restarts listening
+      // when wantListening is still true ("act, then listen again").
+      if (wantListening && rec) { try { rec.stop(); } catch (e) { /* restarts via onend */ } }
+    }
 
     function build() {
       rec = new SR();
@@ -139,6 +180,11 @@
       rec.onstart = () => { api.listening = true; emitStatus('listening'); };
       rec.onend = () => {
         api.listening = false;
+        // Engine ended without a final (common when it stalls): flush the
+        // last interim so a heard command is not lost.
+        const pending = pendingInterim;
+        clearVoiceTimers();
+        if (pending && wantListening) tryCommitInterim(pending);
         if (wantListening) { clearTimeout(restartTimer); restartTimer = setTimeout(() => { try { rec.start(); } catch (e) { /* already started */ } }, 250); }
         else emitStatus('idle');
       };
@@ -150,7 +196,18 @@
       rec.onresult = (ev) => {
         for (let i = ev.resultIndex; i < ev.results.length; i++) {
           const res = ev.results[i];
-          if (!res.isFinal) { if (opts.onInterim) opts.onInterim(res[0].transcript); continue; }
+          if (!res.isFinal) {
+            const t = res[0].transcript;
+            if (opts.onInterim) opts.onInterim(t);
+            // Debounce: only commit once the interim transcript stops changing
+            // (avoids firing "fault" while the user is saying "double fault").
+            clearTimeout(interimTimer);
+            pendingInterim = t;
+            scheduleSilenceStop();
+            interimTimer = setTimeout(() => tryCommitInterim(t), INTERIM_DELAY_MS);
+            continue;
+          }
+          clearVoiceTimers();
           handleFinal(res);
         }
       };
@@ -160,6 +217,9 @@
       const now = Date.now();
       if (now < api.mutedUntil) { if (opts.onIgnored) opts.onIgnored(res[0].transcript, 'Tablet was speaking'); return; }
       if (!api.armed) { if (opts.onIgnored) opts.onIgnored(res[0].transcript, 'Voice not armed — tap the mic'); return; }
+      // Skip the trailing final if we already acted on its interim form.
+      const norm = normalize(res[0].transcript);
+      if (norm && norm === lastCommitNorm && (now - lastCommitAt) < DEDUPE_MS) return;
       const alts = [];
       for (let k = 0; k < res.length; k++) alts.push({ transcript: res[k].transcript, confidence: res[k].confidence });
       deliver(alts, 'mic');
@@ -178,7 +238,14 @@
         const a = parseCall(alt.transcript, { wakeWord: api.wakeWord });
         if (!a) continue;
         const v = opts.validate ? opts.validate(a) : { ok: true };
-        if (v.ok && conf >= api.minConfidence) { opts.onCall(a, { transcript: alt.transcript, confidence: alt.confidence, source }); return; }
+        if (v.ok && conf >= api.minConfidence) {
+          lastCommitNorm = normalize(alt.transcript); lastCommitAt = Date.now();
+          opts.onCall(a, { transcript: alt.transcript, confidence: alt.confidence, source });
+          // Segment utterances so the next call starts clean ("act, then
+          // listen again") instead of buffering into one long session.
+          if (wantListening && rec && source !== 'typed') { try { rec.stop(); } catch (e) { /* restarts via onend */ } }
+          return;
+        }
         if (!firstParsed) { firstParsed = a; firstReason = v.ok ? 'Low confidence (' + Math.round(conf * 100) + '%)' : (v.reason || 'Not reachable'); }
       }
       if (firstParsed) { if (opts.onRejected) opts.onRejected(firstParsed, firstReason, alts[0].transcript); }
@@ -196,6 +263,7 @@
     function stop() {
       wantListening = false;
       clearTimeout(restartTimer);
+      clearVoiceTimers();
       if (rec) { try { rec.stop(); } catch (e) { /* noop */ } }
       api.listening = false;
       emitStatus('idle');

@@ -2,7 +2,7 @@
 
 Voice-scored court tablets and one organizer desk, synced live over WebSockets. Built as a two-court demonstrator for club and community tennis tournaments: singles, doubles and mixed rotations, No-Ad, Fast4/Express, set and 10-point match tiebreaks, serve clocks, timed changeovers with a spoken "Time" call, court-side sponsor loops, and rules pushed to every court from the desk.
 
-![Split-screen demonstrator](docs/demo-split-screen.png)
+![Split-screen demonstrator](courtside-ai/docs/demo-split-screen.png)
 
 ## Run it
 
@@ -37,7 +37,7 @@ Open the tablet pages on real tablets on the same Wi-Fi using the LAN address pr
 
 ### Court tablet
 
-![Court tablet](docs/court-tablet.png)
+![Court tablet](courtside-ai/docs/court-tablet.png)
 
 - **Score wall**: true black background, white numerals sized from the container width so they read from the baseline, optic yellow reserved for the server dot, the live call and the game-point marker. Glare mode inverts to black on white for direct sun.
 - **Serve clock** (default 25 s) resets on every point, fault, let and correction, beeps at zero.
@@ -46,11 +46,11 @@ Open the tablet pages on real tablets on the same Wi-Fi using the LAN address pr
 - **Changeover / set break**: full-screen overlay with the countdown, the next server, a sponsor loop (text, colour, optional logo and a spoken line), the "Time" call at 80 s of a 90 s changeover (tone + speech + yellow flash), auto-resume at zero. A point or fault called during the rest resumes play.
 - **Offline resilience**: match state is saved to the tablet on every change; outgoing updates queue in a persistent outbox and replay on reconnect. The tablet shows "Offline · n queued" and keeps scoring.
 
-![Changeover with sponsor](docs/court-changeover.png)
+![Changeover with sponsor](courtside-ai/docs/court-changeover.png)
 
 ### Organizer desk
 
-![Organizer desk](docs/organizer-desk.png)
+![Organizer desk](courtside-ai/docs/organizer-desk.png)
 
 - **Court cards** drawn as court plans: status (Free / Assigned / Live / Changeover / Finished / Offline), sets, games, points, server dot, call, rest countdown, rules version on that court, voice status, last update.
 - **Queue**: ordered matches with one-tap assignment to any court, an add-match form for singles or doubles, "Assign next" on freed courts.

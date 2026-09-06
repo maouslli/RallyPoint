@@ -588,6 +588,7 @@
     });
     function toggleMic() {
       if (!rec.supported) { toast('Voice recognition needs Chrome, Edge or Safari. The buttons do everything voice does.', 'bad', null, 4000); return; }
+      if (typeof window !== 'undefined' && window.isSecureContext === false) { toast('Voice needs HTTPS: open this tablet over https:// (run `npm run cert` + `npm run start:https` on the hub). The buttons work meanwhile.', 'bad', null, 6000); return; }
       if (rec.status === 'listening' || rec.status === 'starting') {
         if (st.settings.arm && !rec.armed) { rec.arm(true); renderVoiceOnly(); return; }
         rec.stop();

@@ -8,8 +8,15 @@ Voice-scored court tablets and one organizer desk, synced live over WebSockets. 
 
 ```bash
 npm install
-npm start            # http://localhost:3000
+npm start            # https://localhost:3000 (HTTPS only — voice needs it)
 ```
+
+The server is HTTPS-only: browsers gate the microphone behind a secure
+context, so plain `http://192.168.x.x` tablets get mic errors. A
+self-signed cert is generated automatically on first boot (needs openssl;
+or run `npm run cert` yourself). Open the printed `https://<lan-ip>:3000`
+address on the tablets, accept the one-time "not private" warning, then
+voice works. `--key/--cert` (or `SSL_KEY`/`SSL_CERT`) override the certs.
 
 | Page | What it is |
 | --- | --- |

@@ -6,7 +6,9 @@
   "type": "commonjs",
   "scripts": {
     "start": "node server/index.js",
+    "start:https": "node server/index.js",
     "dev": "node server/index.js --port 8080",
+    "cert": "node scripts/generate-cert.js",
     "test": "node --test 'test/*.test.js'",
     "build": "node scripts/build-standalone.js",
     "reset": "node server/index.js --reset"
